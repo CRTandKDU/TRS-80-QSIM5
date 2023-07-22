@@ -1,4 +1,37 @@
-* TRS-80 QSIM5 - A 5-qubit Simulator for the TRS-80 Model I
+* TRS-80 QSIM5 - A 5-qubit Emulator for the TRS-80 Model I
 ** Abstract and Features
-** Inspiration and Acknowledgements
+The ~QSIM5~ program is written in TRS-80 Level II BASIC and targets the TRS-80 Model I (1977) with 48K memory (no Expansion Interface, nor floppies are required). In a bit more than 100 lines, it computes a 5-qubit circuit model.
+
+The following quantum logic gates are available:
+
+  * 1-qubit quantum logic gates
+    * /Pauli-X/ operator, gate *X*
+    * /Pauli-Y/ operator, gate *Y*
+    * /Pauli-Z/ operator, gate *Z*
+    * /Hadamard/ operator, gate *H*
+    * /Phase/ operator, gate *S*
+    * $\Pi/8$ operator, gate *T*
+  * 2-qubit quantum logic gates
+    * /SWAP/ operator on adjacent qubits /n/ and /n+1/, gate *E*
+    * /CNOT/ operator on adjacent qubits /n/ and /n+1/, gate *C*
+
+The circuit is interactively input to ~QSIM5~ as a string representing the sequence of quantum logic gates, each one being two characters long, one of the previous gate name followed by the qubit (0 to 4 for 1-qubit gates; 0 to 3 for 2-qubit gates) it applies to. For instance the [[https://en.wikipedia.org/wiki/Bell_state][Bell state]] is the string ~H0C0~.
+
+As it applies each quantum logical gate in sequence, the emulator computes the new state vector after the operator's transformation. It starts in the ~|00000>~ initial state by default: this can be changed in line 30 of the program.
+
+After each transformation the emulator prints out the current state vector as two lists of 32 floating points values, the first one for the real part and the second for the imaginary parts of the amplitude coefficients over the quantum basis ~{|00000> ... |11111>}~.
+
+Execution times are trying, and for long sequences, prohibitive.
+  
+** Inspiration and Acknowledgments
+Emulating a quantum circuit model of computation does not require (classical) superpower computing resources. Indeed, inspired by [[https://github.com/dakk/qc64][dakk's QC64]] and prompted by none other than [[https://www.oezratty.net/wordpress/blog/charte/][Olivier Ezratty]] who is interested in "a solution for at least 5 to 10 qubits emulation on a 1985 or earlier PC, or on Raspberry Pi!", this far from optimal, quite obscure Level II BASIC program runs quantum logic gates on a TRS-80 Model I (1977 -- as early as it gets). It has been tested with 48K memory on the fantastic [[http://48k.ca/trs80gp.html][trs80gp emulator]] and a trimmed version of the tensor product has been successfully run on a genuine 35+ year old 16K machine.
+
+Also of interest in this endeavor were the following resources:
+
+  * [[https://github.com/corbett/QuantumComputing][Quintuple]]
+  * [[https://github.com/adamisntdead/QuSimPy][QuSimPy]]
+  * [[https://en.wikipedia.org/wiki/Kronecker_product][Kronecker product]] on Wikipedia
+  * [[https://en.wikipedia.org/wiki/Quantum_logic_gate][Quantum logic gate]] on Wikipedia
+  * And of course [[https://press.princeton.edu/books/hardcover/9780691178561/mathematical-foundations-of-quantum-mechanics][Mathematical Foundations of Quantum Mechanics]], by John von Neumann as a welcome wake-up call; followed by  [[https://www.cambridge.org/highereducation/books/quantum-computation-and-quantum-information/01E10196D0A682A6AEFFEA52D53BE9AE#overview][Quantum Computation and Quantum Information]], by Michael A. Nielsen, Isaac L. Chuang, /Massachusetts Institute of Technology/ and [[https://www.cambridge.org/core/books/quantum-computer-science/66462590D10C8010017CF1D7C45708D7][Quantum Computer Science: An Introduction]], by N. David Mermin, /Cornell University New York/, for a refresher.
+    
 ** Implementation Design
