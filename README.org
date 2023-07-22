@@ -35,3 +35,4 @@ Also of interest in this endeavor were the following resources:
   * And of course [[https://press.princeton.edu/books/hardcover/9780691178561/mathematical-foundations-of-quantum-mechanics][Mathematical Foundations of Quantum Mechanics]], by John von Neumann as a welcome wake-up call; followed by  [[https://www.cambridge.org/highereducation/books/quantum-computation-and-quantum-information/01E10196D0A682A6AEFFEA52D53BE9AE#overview][Quantum Computation and Quantum Information]], by Michael A. Nielsen, Isaac L. Chuang, /Massachusetts Institute of Technology/ and [[https://www.cambridge.org/core/books/quantum-computer-science/66462590D10C8010017CF1D7C45708D7][Quantum Computer Science: An Introduction]], by N. David Mermin, /Cornell University New York/, for a refresher.
     
 ** Implementation Design
+$V \otimes W$
