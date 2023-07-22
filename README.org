@@ -1,0 +1,4 @@
+* TRS-80 QSIM5 - A 5-qubit Simulator for the TRS-80 Model I
+** Abstract and Features
+** Inspiration and Acknowledgements
+** Implementation Design
