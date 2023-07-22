@@ -10,7 +10,7 @@ The following quantum logic gates are available:
     * /Pauli-Z/ operator, gate *Z*
     * /Hadamard/ operator, gate *H*
     * /Phase/ operator, gate *S*
-    * $\pi/8$ operator, gate *T*
+    * $\Pi/8$ operator, gate *T*
   * 2-qubit quantum logic gates
     * /SWAP/ operator on adjacent qubits /n/ and /n+1/, gate *E*
     * /CNOT/ operator on adjacent qubits /n/ and /n+1/, gate *C*
@@ -22,9 +22,11 @@ As it applies each quantum logical gate in sequence, the emulator computes the n
 After each transformation the emulator prints out the current state vector as two lists of 32 floating points values, the first one for the real part and the second for the imaginary parts of the amplitude coefficients over the quantum basis ~{|00000> ... |11111>}~.
 
 Execution times are trying, and for long sequences, prohibitive.
+
+[[file:Qubits5.gif]]
   
 ** Inspiration and Acknowledgments
-Emulating a quantum circuit model of computation does not require (classical) superpower computing resources. Indeed, inspired by [[https://github.com/dakk/qc64][dakk's QC64]] and prompted by none other than [[https://www.oezratty.net/wordpress/blog/charte/][Olivier Ezratty]] who is interested in "a solution for at least 5 to 10 qubits emulation on a 1985 or earlier PC, or on Raspberry Pi!", this far from optimal, quite obscure Level II BASIC program runs quantum logic gates on a TRS-80 Model I (1977 -- as early as it gets). It has been tested with 48K memory on the fantastic [[http://48k.ca/trs80gp.html][trs80gp emulator]] and a trimmed version of the tensor product has been successfully run on a genuine 35+ year old 16K machine.
+Emulating a quantum circuit model of computation does not require (classical) superpower computing resources. Indeed, inspired by [[https://github.com/dakk/qc64][dakk's QC64]] and prompted by none other than [[https://www.oezratty.net/wordpress/blog/charte/][Olivier Ezratty]] who is interested in "a solution for at least 5 to 10 qubits emulation on a 1985 or earlier PC, or on Raspberry pi!", this far from optimal, quite obscure Level II BASIC program runs quantum logic gates on a TRS-80 Model I (1977 -- as early as it gets). It has been tested with 48K memory on the fantastic [[http://48k.ca/trs80gp.html][trs80gp emulator]] and a trimmed version of the tensor product has been successfully run on a genuine 35+ year old 16K machine.
 
 Also of interest in this endeavor were the following resources:
 
@@ -32,7 +34,36 @@ Also of interest in this endeavor were the following resources:
   * [[https://github.com/adamisntdead/QuSimPy][QuSimPy]]
   * [[https://en.wikipedia.org/wiki/Kronecker_product][Kronecker product]] on Wikipedia
   * [[https://en.wikipedia.org/wiki/Quantum_logic_gate][Quantum logic gate]] on Wikipedia
-  * And of course [[https://press.princeton.edu/books/hardcover/9780691178561/mathematical-foundations-of-quantum-mechanics][Mathematical Foundations of Quantum Mechanics]], by John von Neumann as a welcome wake-up call; followed by  [[https://www.cambridge.org/highereducation/books/quantum-computation-and-quantum-information/01E10196D0A682A6AEFFEA52D53BE9AE#overview][Quantum Computation and Quantum Information]], by Michael A. Nielsen, Isaac L. Chuang, /Massachusetts Institute of Technology/ and [[https://www.cambridge.org/core/books/quantum-computer-science/66462590D10C8010017CF1D7C45708D7][Quantum Computer Science: An Introduction]], by N. David Mermin, /Cornell University New York/, for a refresher.
+  * And of course [[https://press.princeton.edu/books/hardcover/9780691178561/mathematical-foundations-of-quantum-mechanics][Mathematical Foundations of Quantum Mechanics]], by John von Neumann as a welcome wake-up call; followed by  [[https://www.cambridge.org/highereducation/books/quantum-computation-and-quantum-information/01E10196D0A682A6AEFFEA52D53BE9AE#overview][Quantum Computation and Quantum Information]], by Michael A. Nielsen, Isaac L. Chuang, /Massachusetts Institute of Technology/ and [[https://www.cambridge.org/core/books/quantum-computer-science/66462590D10C8010017CF1D7C45708D7][Quantum Computer Science: An Introduction]], by N. David Merlin, /Cornell University New York/, for a refresher.
     
 ** Implementation Design
-$V \otimes W$
+The design is an extension of /dakk's/ for the C64. All computations are on single precision floats, a type names ~SNG~ in [[http://www.1000bit.it/support/manuali/trs/Level%20II%20BASIC%20Reference%20Manual%20%281979%29%28Radio%20Shack%29.pdf][Level II BASIC]], 6 significant figures displayed. In order to represent a 5-qubit state vector, i.e. 32 complex numbers, two arrays of 32 single precision floats are used, one for the real the other for the imaginary parts of the numbers.
+
+Similarly operator matrices of size /2x2/ for 1-qubit gates and /4x4/ for 2-qubit gates, are represented as two arrays of 4 single precision floats and two arrays of 16 single precision floats, respectively.
+
+The transformation matrix representing a quantum logical gate is computer by repeatedly computing the Kronecker product of operator matrices applying to qubit 0 to 4 in order. For instance the circuit ~H0~ is computed by calculating the transformation $H \otimes Id \otimes Id \otimes Id \otimes Id$, where /Id/ is the /2x2/ identity matrix -- no operator on qubits 1 to 4.
+
+Finally at the end of each computation of the transformation matrix, the latter is applied to the 32-vector representing the state to obtain the new state.
+
+The code is generally organized in elementary procedures, nested for calculations through ~GOSUB~ calls.
+
+Pointers to the BASIC lines:
+
+  - Lines 10-30: Initialization and memory allocation. The starting vector state is created at Line 30.
+  - Lines 40-60: Getting the circuit description string from the user.
+  - Lines 70-120: Iterating computation of the vector state for each quantum logical gate. And ending.
+  - Lines 200-470: Computing transformation for the 1-qubit gates.
+  - Lines 600-750: Applying transformation to vector state and printing the new vector state.
+  - Lines 800-820 and 850-870: Handling 2-qubit gates (SWAP and CNOT) which involve three Kronecker products rather than four.
+  - Lines 900-1120: Transformation matrices for the SWAP gates
+  - Lines 1130-1340: Transformation matrices for the CNOT gates
+
+Remarks: Many of the computations could be simplified as most transformation matrices are /real/ square matrices with a null imaginary part, so most of the values are /0.0/.
+
+The code does not implement the /measure/ component of a quantum circuit model emulator. Doing so would involve normalizing the vector states amplitudes to get proper probabilities and sample from this distribution (using the ~RND~ Level II BASIC instruction).
+
+Emulation of a larger number of qubits might make it worthwhile to investigate sparse matrix representations for the successive Kronecker products, if at the expense of increasing already agonizing execution times. (After all the system is a single Z80 running at a whopping 1.77 MHz!) On the ~trs80gp~ 48K emulated machine, a ~?MEM~ after execution of a simple one-gate circuit shows ~30517~ bytes free.
+
+[[file:qsim5-h1.gif]]
+
+
