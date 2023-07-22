@@ -10,7 +10,7 @@ The following quantum logic gates are available:
     * /Pauli-Z/ operator, gate *Z*
     * /Hadamard/ operator, gate *H*
     * /Phase/ operator, gate *S*
-    * $\Pi/8$ operator, gate *T*
+    * $\pi/8$ operator, gate *T*
   * 2-qubit quantum logic gates
     * /SWAP/ operator on adjacent qubits /n/ and /n+1/, gate *E*
     * /CNOT/ operator on adjacent qubits /n/ and /n+1/, gate *C*
